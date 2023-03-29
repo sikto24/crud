@@ -5,5 +5,3 @@
         <li><a href="index.php?task=seed">Seed</a></li>
     </ul>
 </nav>
-
-<!-- Change -->
