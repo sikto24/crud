@@ -72,10 +72,11 @@ function getReport()
                 <?php
 
                 usort($students, function ($a, $b) {
-                    // return  -$a['age'];
                     if ($b['age'] == $a['age']) return 0;
                     return ($b['age'] < $a['age']) ? -1 : 1;
                 });
+
+
                 foreach ($students as $student) {
                 ?>
                     <tr>
@@ -102,7 +103,7 @@ function getReport()
 }
 
 
-function addStudent($fName, $lName, $age)
+function addStudent($fName, $lName, $age, $id)
 {
     if (file_exists(DB_NAME)) {
         $fileName = file_get_contents(DB_NAME);
@@ -113,7 +114,7 @@ function addStudent($fName, $lName, $age)
         "fName" => $fName,
         "lName" => $lName,
         "age" => $age,
-        "id" => "42",
+        "id" => $id,
     );
 
     array_push($students, $student);

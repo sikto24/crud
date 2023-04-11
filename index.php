@@ -2,6 +2,7 @@
 require_once("functions.php");
 $info = "";
 $task = $_GET['task'] ?? 'report';
+$error = $_GET['error'] ?? '0';
 if ('seed' == $task) {
     seed();
     $info = "Seeding is Complete";
@@ -11,9 +12,11 @@ if (isset($_POST['submit'])) {
     $fName = filter_input(INPUT_POST, 'fName', FILTER_DEFAULT);
     $lName = filter_input(INPUT_POST, 'lName', FILTER_DEFAULT);
     $age = filter_input(INPUT_POST, 'age', FILTER_DEFAULT);
+    $id = filter_input(INPUT_POST, 'id', FILTER_DEFAULT);
 
-    if ($fName != '' && $lName != '' && $age != '') {
-        addStudent($fName, $lName, $age);
+    if ($fName != '' && $lName != '' && $age != '' && $id != '') {
+        addStudent($fName, $lName, $age, $id);
+        header("location: index.php?task=report ");
     }
 }
 ?>
@@ -61,6 +64,16 @@ if (isset($_POST['submit'])) {
                 </div>
             </div>
 
+            <?php if ('1' == $error) : ?>
+                <div class="row align-center">
+                    <div class="column column-75 text-center">
+                        <blockquote>
+                            Dulplicate ID Number
+                        </blockquote>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if ('report' == $task) : ?>
                 <div class="row align-center">
                     <div class="column column-75 text-center">
@@ -79,7 +92,9 @@ if (isset($_POST['submit'])) {
                             <input type="text" name="lName" id="lName">
                             <label for="age">Age</label>
                             <input type="number" name="age" id="age">
-                            <button type="submit" id="save">Save</button>
+                            <label for="id">Id</label>
+                            <input type="number" name="id" id="id">
+                            <button type="submit" name="submit" id="save">Save</button>
                         </form>
                     </div>
                 </div>
