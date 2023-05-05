@@ -6,38 +6,38 @@ function seed()
         array(
             "fName" => "Md Abu Al",
             "lName" => "Sayed",
-            "age" => "26.07",
-            "id" => "82",
+            "roll" => "82",
+            "id" => "1",
         ),
         array(
             "fName" => "shafayat",
             "lName" => "Hossain",
-            "age" => "26.11",
-            "id" => "91",
+            "roll" => "91",
+            "id" => "2",
         ),
         array(
             "fName" => "Sufol",
             "lName" => "Mondol",
-            "age" => "28.8",
-            "id" => "99",
+            "roll" => "99",
+            "id" => "3",
         ),
         array(
             "fName" => "Jahanara",
             "lName" => "Ferdous",
-            "age" => "27.03",
-            "id" => "90",
+            "roll" => "90",
+            "id" => "4",
         ),
         array(
             "fName" => "Ibrahim",
             "lName" => "Kholil",
-            "age" => "29.07",
-            "id" => "18",
+            "roll" => "18",
+            "id" => "5",
         ),
         array(
             "fName" => "Mosiur",
             "lName" => "Rahman",
-            "age" => "27.05",
-            "id" => "42",
+            "roll" => "42",
+            "id" => "6",
         ),
 
     );
@@ -62,8 +62,7 @@ function getReport()
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Age</th>
-                    <th>Id</th>
+                    <th>Roll</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -71,10 +70,10 @@ function getReport()
 
                 <?php
 
-                usort($students, function ($a, $b) {
-                    if ($b['age'] == $a['age']) return 0;
-                    return ($b['age'] < $a['age']) ? -1 : 1;
-                });
+                // usort($students, function ($a, $b) {
+                //     if ($b['roll'] == $a['roll']) return 0;
+                //     return ($b['roll'] < $a['roll']) ? -1 : 1;
+                // });
 
 
                 foreach ($students as $student) {
@@ -82,8 +81,7 @@ function getReport()
                     <tr>
 
                         <td><?php printf("%s %s", $student['fName'], $student['lName']); ?></td>
-                        <td><?php printf("%s", $student['age']); ?></td>
-                        <td><?php printf("%s", $student['id']); ?></td>
+                        <td><?php printf("%s", $student['roll']); ?></td>
                         <td><?php printf("<a href='index.php?task=edit&id=%s'>Edit</a> | <a href='index.php?task=delete&id=%s'>Delete</a>", $student['id'], $student['id']); ?></td>
                     </tr>
 
@@ -103,21 +101,89 @@ function getReport()
 }
 
 
-function addStudent($fName, $lName, $age, $id)
+function addStudent($fName, $lName,  $roll)
+{
+    $found = false;
+    if (file_exists(DB_NAME)) {
+        $fileName = file_get_contents(DB_NAME);
+        $students = json_decode($fileName, true);
+    }
+    foreach ($students as $_student) {
+        if ($_student['roll'] == $roll) {
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+
+        $newID = count($students) + 1;
+        $student = array(
+            "fName" => $fName,
+            "lName" => $lName,
+            "roll" => $roll,
+            "id" => $newID,
+        );
+
+
+
+        array_push($students, $student);
+        $dataJson = json_encode($students);
+        file_put_contents(DB_NAME, $dataJson, LOCK_EX);
+
+        return true;
+    }
+}
+
+
+function getStudent($id)
+{
+    if (file_exists(DB_NAME)) {
+        $fileName = file_get_contents(DB_NAME);
+        $students = json_decode($fileName, true);
+    }
+    foreach ($students as $student) {
+        if ($student['id'] == $id) {
+            return $student;
+        }
+    }
+    return false;
+}
+
+
+function updateStudent($fName, $lName, $roll, $id)
+{
+    $found = false;
+    if (file_exists(DB_NAME)) {
+        $fileName = file_get_contents(DB_NAME);
+        $students = json_decode($fileName, true);
+    }
+
+    foreach ($students as $student) {
+        if ($student['roll'] == $roll &&  $student['id'] != $id) {
+            $found = true;
+            break;
+        }
+    }
+
+    if (!$found) {
+        $students[$id - 1]['fName'] = $fName;
+        $students[$id - 1]['lName'] = $lName;
+        $students[$id - 1]['roll'] = $roll;
+
+        $dataJson = json_encode($students);
+        file_put_contents(DB_NAME, $dataJson, LOCK_EX);
+        return true;
+    }
+    return false;
+}
+
+
+function deleteUser($id)
 {
     if (file_exists(DB_NAME)) {
         $fileName = file_get_contents(DB_NAME);
         $students = json_decode($fileName, true);
     }
 
-    $student = array(
-        "fName" => $fName,
-        "lName" => $lName,
-        "age" => $age,
-        "id" => $id,
-    );
-
-    array_push($students, $student);
-    $dataJson = json_encode($students);
-    file_put_contents(DB_NAME, $dataJson, LOCK_EX);
+    unset($students[$id - 1]);
 }

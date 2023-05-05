@@ -7,16 +7,39 @@ if ('seed' == $task) {
     seed();
     $info = "Seeding is Complete";
 }
-
+if ('delete' == $task) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_DEFAULT);
+    deleteUser($id);
+}
+$fName = '';
+$lName = '';
+$id = '';
+$roll = '';
 if (isset($_POST['submit'])) {
     $fName = filter_input(INPUT_POST, 'fName', FILTER_DEFAULT);
     $lName = filter_input(INPUT_POST, 'lName', FILTER_DEFAULT);
-    $age = filter_input(INPUT_POST, 'age', FILTER_DEFAULT);
     $id = filter_input(INPUT_POST, 'id', FILTER_DEFAULT);
+    $roll = filter_input(INPUT_POST, 'roll', FILTER_DEFAULT);
 
-    if ($fName != '' && $lName != '' && $age != '' && $id != '') {
-        addStudent($fName, $lName, $age, $id);
-        header("location: index.php?task=report ");
+
+    if ($id) {
+        if ($fName != '' && $lName != '' && $roll != '') {
+            $result =  updateStudent($fName, $lName, $roll, $id);
+            if ($result) {
+                header("location:index.php?task=report");
+            } else {
+                $error = 1;
+            }
+        }
+    } else {
+        if ($fName != '' && $lName != '' && $roll != '') {
+            $result = addStudent($fName, $lName, $roll);
+            if ($result) {
+                header("location:index.php?task=report");
+            } else {
+                $error = 1;
+            }
+        }
     }
 }
 ?>
@@ -67,9 +90,11 @@ if (isset($_POST['submit'])) {
             <?php if ('1' == $error) : ?>
                 <div class="row align-center">
                     <div class="column column-75 text-center">
-                        <blockquote>
-                            Dulplicate ID Number
-                        </blockquote>
+
+                        <script>
+                            alert('Dulplicate ID Number ');
+                        </script>
+
                     </div>
                 </div>
             <?php endif; ?>
@@ -85,20 +110,42 @@ if (isset($_POST['submit'])) {
             <?php if ('add' == $task) : ?>
                 <div class="row align-center">
                     <div class="column column-50">
-                        <form action="index.php?=report" method="POST">
+                        <form action="index.php?task=add" method="POST">
                             <label for="fName">Frist Name</label>
-                            <input type="text" name="fName" id="fName">
+                            <input type="text" name="fName" id="fName" value="<?php echo $fName; ?>">
                             <label for="lName">Last Name</label>
-                            <input type="text" name="lName" id="lName">
-                            <label for="age">Age</label>
-                            <input type="number" name="age" id="age">
-                            <label for="id">Id</label>
-                            <input type="number" name="id" id="id">
+                            <input type="text" name="lName" id="lName" value="<?php echo $lName; ?>">
+                            <label for="roll">Roll</label>
+                            <input type="number" name="roll" id="roll" value="<?php echo $roll; ?>">
                             <button type="submit" name="submit" id="save">Save</button>
                         </form>
                     </div>
                 </div>
             <?php endif; ?>
+
+            <?php
+            if ('edit' == $task) :
+                $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
+                $student = getStudent($id);
+                if ($student) :
+            ?>
+                    <div class="row align-center">
+                        <div class="column column-50">
+                            <form method="POST">
+                                <input type="hidden" name="id" id="id" value="<?php echo $id; ?>">
+                                <label for="fName">Frist Name</label>
+                                <input type="text" name="fName" id="fName" value="<?php echo $student['fName']; ?>">
+                                <label for="lName">Last Name</label>
+                                <input type="text" name="lName" id="lName" value="<?php echo $student['lName']; ?>">
+                                <label for="roll">Roll</label>
+                                <input type="number" name="roll" id="roll" value="<?php echo $student['roll']; ?>">
+                                <button type="submit" name="submit" id="save">Update</button>
+                            </form>
+                        </div>
+                    </div>
+            <?php
+                endif;
+            endif; ?>
         </div>
     </div>
 
