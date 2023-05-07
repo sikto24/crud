@@ -82,7 +82,7 @@ function getReport()
 
                         <td><?php printf("%s %s", $student['fName'], $student['lName']); ?></td>
                         <td><?php printf("%s", $student['roll']); ?></td>
-                        <td><?php printf("<a href='index.php?task=edit&id=%s'>Edit</a> | <a href='index.php?task=delete&id=%s'>Delete</a>", $student['id'], $student['id']); ?></td>
+                        <td><?php printf("<a href='index.php?task=edit&id=%s'>Edit</a> | <a class='delete' href='index.php?task=delete&id=%s'>Delete</a>", $student['id'], $student['id']); ?></td>
                     </tr>
 
                 <?php
@@ -116,7 +116,7 @@ function addStudent($fName, $lName,  $roll)
     }
     if (!$found) {
 
-        $newID = count($students) + 1;
+        $newID = getNewId($students);
         $student = array(
             "fName" => $fName,
             "lName" => $lName,
@@ -132,6 +132,7 @@ function addStudent($fName, $lName,  $roll)
 
         return true;
     }
+    return false;
 }
 
 
@@ -183,7 +184,33 @@ function deleteUser($id)
     if (file_exists(DB_NAME)) {
         $fileName = file_get_contents(DB_NAME);
         $students = json_decode($fileName, true);
+        foreach ($students as $offset => $student) {
+            if ($student['id'] == $id) {
+                unset($students[$offset]);
+            }
+        }
+        $dataJson = json_encode($students);
+        file_put_contents(DB_NAME, $dataJson, LOCK_EX);
     }
+}
 
-    unset($students[$id - 1]);
+
+
+
+
+function getNewId($students)
+{
+    $maxId = max(array_column($students, 'id'));
+    return $maxId + 1;
+}
+
+
+function printRaw()
+{
+    if (file_exists(DB_NAME)) {
+        $fileName = file_get_contents(DB_NAME);
+        $students = json_decode($fileName, true);
+
+        print_r($students);
+    }
 }

@@ -8,8 +8,9 @@ if ('seed' == $task) {
     $info = "Seeding is Complete";
 }
 if ('delete' == $task) {
-    $id = filter_input(INPUT_POST, 'id', FILTER_DEFAULT);
+    $id = filter_input(INPUT_GET, 'id', FILTER_DEFAULT);
     deleteUser($id);
+    header("location:index.php?task=report");
 }
 $fName = '';
 $lName = '';
@@ -149,7 +150,7 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
-
+    <script src="/assets/js/main.js"></script>
 </body>
 
 </html>
