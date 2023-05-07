@@ -198,13 +198,33 @@ function deleteUser($id)
 
 
 
-function getNewId($students)
+// function getNewId($students)
+// {
+//     $maxId = max(array_column($students, 'id'));
+//     $max = $maxId + 1;
+//     return $max;
+// }
+$maxId = 0;
+function getNewId(array $students): int
 {
-    $maxId = max(array_column($students, 'id'));
+    global $maxId;
+    foreach ($students as $student) {
+        if ($student['id'] > $maxId) {
+            $maxId = $student['id'];
+        }
+    }
     return $maxId + 1;
 }
 
 
+
+function hello()
+{
+    $fileName = file_get_contents(DB_NAME);
+    $students = json_decode($fileName, true);
+    $newIds = getNewId($students);
+    echo $newIds;
+}
 function printRaw()
 {
     if (file_exists(DB_NAME)) {

@@ -9,8 +9,10 @@ if ('seed' == $task) {
 }
 if ('delete' == $task) {
     $id = filter_input(INPUT_GET, 'id', FILTER_DEFAULT);
-    deleteUser($id);
-    header("location:index.php?task=report");
+    if ($id > 0) {
+        deleteUser($id);
+        header("location:index.php?task=report");
+    }
 }
 $fName = '';
 $lName = '';
